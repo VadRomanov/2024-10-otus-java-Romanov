@@ -2,13 +2,14 @@ package homework;
 
 import java.util.AbstractMap;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 
 public class CustomerService {
 
     // важно подобрать подходящую Map-у, посмотрите на редко используемые методы, они тут полезны
 
-    private final TreeMap<Customer, String> customerMap;
+    private final NavigableMap<Customer, String> customerMap;
 
     public CustomerService() {
         this.customerMap = new TreeMap<>((o1, o2) -> (int) (o1.getScores() - o2.getScores()));
