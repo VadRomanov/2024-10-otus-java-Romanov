@@ -3,7 +3,8 @@ package ru.otus.runner;
 import ru.otus.annotations.After;
 import ru.otus.annotations.Before;
 import ru.otus.annotations.Test;
-import ru.otus.dto.ResultDto;
+import ru.otus.dto.TestsResultDto;
+import ru.otus.dto.TestMethodsDto;
 import ru.otus.runner.validator.Validator;
 
 import java.lang.annotation.Annotation;
@@ -21,12 +22,17 @@ public class TestRunner {
         methodRunner = new MethodRunner();
     }
 
-    public ResultDto startTesting(String testClassName) throws ClassNotFoundException {
-        Class<?> testClass = getTestClass(testClassName);
+    public TestsResultDto runTests(String testClassName) throws ClassNotFoundException {
+        Class<?> testClass = Class.forName(testClassName);
 
+        final TestMethodsDto testMethods = prepareTestMethods(testClass);
+        return invokeTestMethods(testMethods, testClass);
+    }
+
+    private TestMethodsDto prepareTestMethods(Class<?> testClass) {
         Set<Method> testMethods = new HashSet<>();
-        Method beforeMethod = null;
-        Method afterMethod = null;
+        Set<Method> beforeMethod = new HashSet<>();
+        Set<Method> afterMethod = new HashSet<>();
 
         for (Method method : testClass.getDeclaredMethods()) {
             List<Annotation> annotations = List.of(method.getAnnotations());
@@ -38,26 +44,19 @@ public class TestRunner {
                     testMethods.add(method);
                 }
                 if (annotation instanceof Before) {
-                    beforeMethod = method;
+                    beforeMethod.add(method);
                 }
                 if (annotation instanceof After) {
-                    afterMethod = method;
+                    afterMethod.add(method);
                 }
             }
         }
 
-        return methodRunner.invokeMethods(beforeMethod, afterMethod, testMethods, testClass);
+        return new TestMethodsDto(testMethods, beforeMethod, afterMethod);
     }
 
-    private Class<?> getTestClass(String testClassName) throws ClassNotFoundException {
-        String classFullName = "ru.otus.test.%s".formatted(testClassName);
-        Class<?> testClass;
-        try {
-            testClass = Class.forName(classFullName);
-        } catch (ClassNotFoundException e) {
-            throw new ClassNotFoundException("Class %s not found.".formatted(classFullName));
-        }
-        return testClass;
+    private TestsResultDto invokeTestMethods(TestMethodsDto testMethods, Class<?> testClass) {
+        return methodRunner.runTests(testMethods, testClass);
     }
 
 }

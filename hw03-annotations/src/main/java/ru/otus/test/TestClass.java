@@ -17,9 +17,12 @@ public class TestClass {
     private List<Integer> testValues;
 
     @Before
-    void setup() {
+    void setupSut() {
         sut = new TestService<>();
+    }
 
+    @Before
+    void setupTestValues() {
         testValues = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             testValues.add(i);
@@ -27,8 +30,12 @@ public class TestClass {
     }
 
     @After
-    void afterEach() {
+    void clearSut() {
         sut = null;
+    }
+
+    @After
+    void clearValues() {
         testValues = null;
     }
 

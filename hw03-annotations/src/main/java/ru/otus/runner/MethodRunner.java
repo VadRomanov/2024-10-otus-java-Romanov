@@ -2,7 +2,8 @@ package ru.otus.runner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.otus.dto.ResultDto;
+import ru.otus.dto.TestsResultDto;
+import ru.otus.dto.TestMethodsDto;
 import ru.otus.reflection.ReflectionHelper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,15 +13,15 @@ import java.util.Set;
 public class MethodRunner {
     private static final Logger logger = LoggerFactory.getLogger(MethodRunner.class);
 
-    public ResultDto invokeMethods(Method beforeMethod, Method afterMethod, Set<Method> testMethods, Class<?> clazz) {
+    public TestsResultDto runTests(TestMethodsDto testMethods, Class<?> testClass) {
         Integer passed = 0;
         Integer failed = 0;
-        for (Method testMethod : testMethods) {
-            Object object = ReflectionHelper.instantiate(clazz);
+        for (Method testMethod : testMethods.getTestMethods()) {
+            Object object = ReflectionHelper.instantiate(testClass);
             try {
-                invokeMethod(beforeMethod, object);
+                invokeBeforeOrAfterMethods(testMethods.getBeforeMethods(), object);
                 boolean successful = invokeTestMethod(testMethod, object);
-                invokeMethod(afterMethod, object);
+                invokeBeforeOrAfterMethods(testMethods.getAfterMethods(), object);
                 if (successful) {
                     passed++;
                 } else {
@@ -32,7 +33,7 @@ public class MethodRunner {
             }
         }
 
-        return new ResultDto(passed, failed);
+        return new TestsResultDto(passed, failed);
     }
 
     @SuppressWarnings("java:S3011")
@@ -52,10 +53,9 @@ public class MethodRunner {
         }
     }
 
-
     @SuppressWarnings("java:S3011")
-    private void invokeMethod(Method method, Object object) {
-        if (method != null) {
+    private void invokeBeforeOrAfterMethods(Set<Method> methods, Object object) {
+        for (Method method : methods) {
             method.setAccessible(true);
             try {
                 method.invoke(object);

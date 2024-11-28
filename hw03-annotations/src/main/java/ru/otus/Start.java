@@ -2,7 +2,7 @@ package ru.otus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.otus.dto.ResultDto;
+import ru.otus.dto.TestsResultDto;
 import ru.otus.runner.TestRunner;
 
 public class Start {
@@ -12,10 +12,10 @@ public class Start {
         TestRunner testRunner = new TestRunner();
         for (String testClass : args) {
             try {
-                ResultDto result = testRunner.startTesting(testClass);
+                TestsResultDto result = testRunner.runTests(testClass);
                 logger.info("Tests: {}. Passed: {}. Failed: {}", result.getTotal(), result.getPassed(), result.getFailed());
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(e.toString());
             }
         }
     }

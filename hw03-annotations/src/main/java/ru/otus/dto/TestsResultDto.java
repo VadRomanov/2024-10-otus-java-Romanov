@@ -1,10 +1,10 @@
 package ru.otus.dto;
 
-public class ResultDto {
+public class TestsResultDto {
     private Integer passed;
     private Integer failed;
 
-    public ResultDto(Integer passed, Integer failed) {
+    public TestsResultDto(Integer passed, Integer failed) {
         this.passed = passed;
         this.failed = failed;
     }
