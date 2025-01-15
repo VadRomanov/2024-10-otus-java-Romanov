@@ -9,29 +9,34 @@ import java.util.TreeMap;
 
 public class StorageImpl implements Storage {
 
-  private static final Map<Denomination, Integer> CELLS = new TreeMap<>();
+  private final Map<Denomination, Integer> cells;
+
+  public StorageImpl() {
+    this.cells = new TreeMap<>();
+  }
 
   public void addToCell(Denomination cellDenomination, Integer amount) {
-    int currentValue = CELLS.getOrDefault(cellDenomination, 0);
+    int currentValue = cells.getOrDefault(cellDenomination, 0);
     int newValue = currentValue + amount;
-    CELLS.put(cellDenomination, newValue);
+    cells.put(cellDenomination, newValue);
   }
 
   public void extractFromCell(Denomination cellDenomination, Integer amount) {
-    int currentValue = CELLS.getOrDefault(cellDenomination, 0);
+    int currentValue = cells.getOrDefault(cellDenomination, 0);
     if (currentValue < amount) {
-      throw new RuntimeException("The requested amount is greater than available");
+      throw new RuntimeException("The requested amount %s is greater than available in the cell. Available: %s"
+          .formatted(amount, currentValue));
     }
 
     int newValue = currentValue - amount;
-    CELLS.put(cellDenomination, newValue);
+    cells.put(cellDenomination, newValue);
   }
 
   public int getCellValue(Denomination cellDenomination) {
-    return CELLS.getOrDefault(cellDenomination, 0);
+    return cells.getOrDefault(cellDenomination, 0);
   }
 
   public Set<Denomination> getCellDenominations() {
-    return CELLS.keySet();
+    return cells.keySet();
   }
 }

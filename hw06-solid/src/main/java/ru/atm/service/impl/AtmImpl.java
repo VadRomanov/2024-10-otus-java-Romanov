@@ -28,10 +28,10 @@ public class AtmImpl implements Atm {
   @Override
   public Map<Denomination, Integer> giveOutRequestedAmount(int requestedAmount) {
     if (requestedAmount <= 0) {
-      throw new IllegalArgumentException("Requested amount can not be less then 0");
+      throw new IllegalArgumentException("Requested amount can not be less then 0. Requested: %s".formatted(requestedAmount));
     }
     if (requestedAmount > balanceCounter.countBalance()) {
-      throw new IllegalArgumentException("Requested amount is greater then account balance");
+      throw new IllegalArgumentException("The requested amount is greater then account balance. Requested: %s".formatted(requestedAmount));
     }
     return dispenser.dispense(requestedAmount);
   }

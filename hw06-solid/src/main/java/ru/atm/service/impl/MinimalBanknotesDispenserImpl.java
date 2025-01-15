@@ -70,7 +70,8 @@ public class MinimalBanknotesDispenserImpl implements Dispenser {
     }
 
     if (resultAmount != requestedAmount) {
-      throw new RuntimeException("The requested amount can not be issued");
+      throw new RuntimeException("The requested amount can not be issued. Available denominations: %s"
+          .formatted(storage.getCellDenominations()));
     }
   }
 }

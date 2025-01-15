@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 class AtmTest {
   private Atm atm;
-  private Storage storage;
 
   @ParameterizedTest()
   @ValueSource(ints = {0, -1})
@@ -30,7 +29,7 @@ class AtmTest {
     this.atm = new AtmImpl(null, null, null);
     RuntimeException exception = assertThrows(RuntimeException.class, () -> atm.giveOutRequestedAmount(value));
 
-    assertEquals("Requested amount can not be less then 0", exception.getMessage());
+    assertEquals("Requested amount can not be less then 0. Requested: %s".formatted(value), exception.getMessage());
   }
 
   @Test
@@ -38,12 +37,12 @@ class AtmTest {
     this.atm = new AtmImpl(null, null, new BalanceCounterImpl(new StorageImpl()));
     RuntimeException exception = assertThrows(RuntimeException.class, () -> atm.giveOutRequestedAmount(1_000_000));
 
-    assertEquals("Requested amount is greater then account balance", exception.getMessage());
+    assertEquals("The requested amount is greater then account balance. Requested: 1000000", exception.getMessage());
   }
 
   @Test
   void giveOutRequestedAmountTest() {
-    storage = new StorageImpl();
+    Storage storage = new StorageImpl();
     this.atm = new AtmImpl(new SaverImpl(storage), new MinimalBanknotesDispenserImpl(storage), new BalanceCounterImpl(storage));
 
     atm.acceptBanknotes(Denomination.FIVE_HUNDRED, 2);
@@ -60,10 +59,24 @@ class AtmTest {
     );
   }
 
+  @Test
+  void giveOutRequestedAmountFailureTest() {
+    Storage storage = new StorageImpl();
+    this.atm = new AtmImpl(new SaverImpl(storage), new MinimalBanknotesDispenserImpl(storage), new BalanceCounterImpl(storage));
+
+    atm.acceptBanknotes(Denomination.FIVE_HUNDRED, 2);
+    atm.acceptBanknotes(Denomination.ONE_HUNDRED, 12);
+
+    RuntimeException exception = assertThrows(RuntimeException.class, () -> atm.giveOutRequestedAmount(1207));
+
+    assertEquals("The requested amount can not be issued. Available denominations: [ONE_HUNDRED, FIVE_HUNDRED]",
+        exception.getMessage());
+  }
+
   @DisplayName("вернуть положительный баланс на счете")
   @Test
   void displayAccountBalanceTest() {
-    storage = mock(Storage.class);
+    Storage storage = mock(Storage.class);
     this.atm = new AtmImpl(null, null, new BalanceCounterImpl(storage));
 
     when(storage.getCellValue(Denomination.FIVE_HUNDRED)).thenReturn(2);
@@ -79,7 +92,7 @@ class AtmTest {
   @DisplayName("пополнить счет")
   @Test
   void acceptBanknotesTest() {
-    storage = new StorageImpl();
+    Storage storage = new StorageImpl();
     this.atm = new AtmImpl(new SaverImpl(storage), null, new BalanceCounterImpl(storage));
 
     atm.acceptBanknotes(Denomination.FIVE_HUNDRED, 2);
