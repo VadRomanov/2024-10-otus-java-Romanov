@@ -7,6 +7,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 class Ioc {
   private static final Logger logger = LoggerFactory.getLogger(Ioc.class);
@@ -21,10 +23,12 @@ class Ioc {
   }
 
   static class DemoInvocationHandler implements InvocationHandler {
-    private final TestLoggingInterface myClass;
+    private final Object myClass;
+    private final Map<Method, Method> methods;
 
-    DemoInvocationHandler(TestLoggingInterface myClass) {
+    DemoInvocationHandler(Object myClass) {
       this.myClass = myClass;
+      this.methods = new HashMap<>();
     }
 
     @Override
@@ -34,7 +38,7 @@ class Ioc {
     }
 
     private void logMethodNameAndParamsIfNeeded(Method method, Object[] args) throws NoSuchMethodException {
-      var methodImpl = TestLogging.class.getMethod(method.getName(), method.getParameterTypes());
+      var methodImpl = getImplMethod(method);
       if (methodImpl.isAnnotationPresent(Log.class)) {
         logger.info("executed method: {}{}",
             method.getName(),
@@ -42,6 +46,15 @@ class Ioc {
                 ", %s: %s".formatted(args.length > 1 ? "params" : "param", Arrays.toString(args))
         );
       }
+    }
+
+    private Method getImplMethod(Method method) throws NoSuchMethodException {
+      var methodImpl = methods.get(method);
+      if (methodImpl == null) {
+        methodImpl = myClass.getClass().getMethod(method.getName(), method.getParameterTypes());
+        methods.put(method, methodImpl);
+      }
+      return methodImpl;
     }
   }
 }
