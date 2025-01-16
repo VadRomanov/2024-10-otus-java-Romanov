@@ -33,7 +33,7 @@ class Ioc {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      if (methodsToBeLogged.contains(method.getName() + Arrays.toString(method.getParameterTypes()))) {
+      if (methodsToBeLogged.contains(getMethodSignature(method))) {
         logMethodInvocation(method.getName(), args);
       }
       return method.invoke(obj, args);
@@ -51,8 +51,12 @@ class Ioc {
     private Set<String> getMethodsToBeLogged(Class<?> clazz) {
       return Arrays.stream(clazz.getMethods())
           .filter(m -> m.isAnnotationPresent(Log.class))
-          .map(m -> m.getName() + Arrays.toString(m.getParameterTypes()))
+          .map(this::getMethodSignature)
           .collect(Collectors.toSet());
+    }
+
+    private String getMethodSignature(Method method) {
+      return method.getName() + Arrays.toString(method.getParameterTypes());
     }
   }
 }
