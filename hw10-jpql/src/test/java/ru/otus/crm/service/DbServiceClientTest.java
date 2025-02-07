@@ -2,29 +2,24 @@ package ru.otus.crm.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Disabled;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.base.AbstractHibernateTest;
+import ru.otus.crm.model.Address;
 import ru.otus.crm.model.Client;
+import ru.otus.crm.model.Phone;
 
 @DisplayName("Демо работы с hibernate (с абстракциями) должно ")
 @SuppressWarnings("java:S125")
 class DbServiceClientTest extends AbstractHibernateTest {
 
     @Test
-    @Disabled("Удалить при выполнении ДЗ")
     @DisplayName(" корректно сохранять, изменять и загружать клиента")
     void shouldCorrectSaveClient() {
         // given
-        var client = new Client("Ivan");
-
-        // Это надо раскомментировать, у выполненного ДЗ, все тесты должны проходить
-        // Кроме удаления комментирования, тестовый класс менять нельзя
-        /*
-                var client = new Client(null, "Vasya", new Address(null, "AnyStreet"), List.of(new Phone(null, "13-555-22"),
-                        new Phone(null, "14-666-333")));
-        */
+        var client = new Client(null, "Vasya", new Address(null, "AnyStreet"), List.of(new Phone(null, "13-555-22"),
+            new Phone(null, "14-666-333")));
 
         // when
         var savedClient = dbServiceClient.saveClient(client);

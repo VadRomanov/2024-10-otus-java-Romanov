@@ -16,4 +16,6 @@ dependencies {
 
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
+
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
 }
