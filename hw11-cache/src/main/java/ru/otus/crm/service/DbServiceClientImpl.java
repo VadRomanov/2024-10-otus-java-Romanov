@@ -16,10 +16,10 @@ public class DbServiceClientImpl implements DBServiceClient {
     private final DataTemplate<Client> clientDataTemplate;
     private final TransactionManager transactionManager;
 
-    private final HwCache<Long, Client> cache;
+    private final HwCache<String, Client> cache;
 
 
-    public DbServiceClientImpl(TransactionManager transactionManager, DataTemplate<Client> clientDataTemplate, HwCache<Long, Client> cache) {
+    public DbServiceClientImpl(TransactionManager transactionManager, DataTemplate<Client> clientDataTemplate, HwCache<String, Client> cache) {
         this.transactionManager = transactionManager;
         this.clientDataTemplate = clientDataTemplate;
         this.cache = cache;
@@ -31,12 +31,12 @@ public class DbServiceClientImpl implements DBServiceClient {
             var clientCloned = client.clone();
             if (client.getId() == null) {
                 var savedClient = clientDataTemplate.insert(session, clientCloned);
-                cache.put(savedClient.getId(), savedClient);
+                cache.put(savedClient.getId().toString(), savedClient);
                 log.info("created client: {}", clientCloned);
                 return savedClient;
             }
             var savedClient = clientDataTemplate.update(session, clientCloned);
-            cache.put(savedClient.getId(), savedClient);
+            cache.put(savedClient.getId().toString(), savedClient);
             log.info("updated client: {}", savedClient);
             return savedClient;
         });
@@ -44,7 +44,7 @@ public class DbServiceClientImpl implements DBServiceClient {
 
     @Override
     public Optional<Client> getClient(long id) {
-        var cachedClient = cache.get(id);
+        var cachedClient = cache.get(String.valueOf(id));
         if (cachedClient != null) {
             return Optional.of(cachedClient);
         }
@@ -52,7 +52,7 @@ public class DbServiceClientImpl implements DBServiceClient {
             var clientOptional = clientDataTemplate.findById(session, id);
             if (clientOptional.isPresent()) {
                 var client = clientOptional.get();
-                cache.put(client.getId(), client);
+                cache.put(client.getId().toString(), client);
             }
             log.info("client: {}", clientOptional);
             return clientOptional;
@@ -61,12 +61,9 @@ public class DbServiceClientImpl implements DBServiceClient {
 
     @Override
     public List<Client> findAll() {
-        var cachedClients = cache.getAll();
-        if (!cachedClients.isEmpty()) {
-            return cachedClients;
-        }
         return transactionManager.doInReadOnlyTransaction(session -> {
             var clientList = clientDataTemplate.findAll(session);
+            clientList.forEach(client -> cache.put(client.getId().toString(), client));
             log.info("clientList:{}", clientList);
             return clientList;
         });

@@ -18,22 +18,15 @@ public class MyCache<K, V> implements HwCache<K, V> {
 
     @Override
     public void remove(K key) {
-        var value = cache.remove(key);
+        V value = cache.remove(key);
         notify(key, value, "remove");
     }
 
     @Override
     public V get(K key) {
-        var value = cache.get(key);
+        V value = cache.get(key);
         notify(key, value, "get");
         return value;
-    }
-
-    @Override
-    public List<V> getAll() {
-        var values = cache.values().stream().toList();
-        values.forEach(value -> notify(null, value, "getAll"));
-        return values;
     }
 
     @Override

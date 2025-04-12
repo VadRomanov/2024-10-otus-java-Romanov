@@ -27,7 +27,7 @@ public abstract class AbstractHibernateTest {
     protected SessionFactory sessionFactory;
     protected TransactionManagerHibernate transactionManager;
     protected DataTemplateHibernate<Client> clientTemplate;
-    protected HwCache<Long, Client> cache;
+    protected HwCache<String, Client> cache;
     protected DBServiceClient dbServiceClient;
 
     private static TestContainersConfig.CustomPostgreSQLContainer CONTAINER;
@@ -63,9 +63,9 @@ public abstract class AbstractHibernateTest {
         clientTemplate = new DataTemplateHibernate<>(Client.class);
         cache = new MyCache<>();
 
-        HwListener<Long, Client> listener = new HwListener<Long, Client>() {
+        HwListener<String, Client> listener = new HwListener<String, Client>() {
             @Override
-            public void notify(Long id, Client client, String action) {
+            public void notify(String id, Client client, String action) {
                 logger.info("Id:{}, client:{}, action: {}", id, client, action);
             }
         };
