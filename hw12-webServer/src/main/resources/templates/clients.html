@@ -1,0 +1,86 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Клиенты</title>
+        <script>
+            function createClient() {
+                const clientNameTextBox = document.getElementById('clientNameTextBox');
+                const clientAddressTextBox = document.getElementById('clientAddressTextBox');
+                const clientPhonesTextBox = document.getElementById('clientPhonesTextBox');
+                const clientCreationContainer = document.getElementById('clientCreationContainer');
+
+                const client = {
+                    name: clientNameTextBox.value,
+                    address: clientAddressTextBox.value,
+                    phones: clientPhonesTextBox.value
+                };
+
+                fetch('/api/client', {
+                        method: 'POST',
+                        body: JSON.stringify(client)
+                     })
+                    .then(response => response.json())
+                    .then(newClient => clientCreationContainer.innerHTML = JSON.stringify(newClient));
+            }
+        </script>
+        <script>
+            function getClientById() {
+                const clientIdTextBox = document.getElementById('clientIdTextBox');
+                const clientDataContainer = document.getElementById('clientDataContainer');
+                const id = clientIdTextBox.value;
+                fetch('/api/client/' + id)
+                    .then(response => response.json())
+                    .then(client => clientDataContainer.innerHTML = JSON.stringify(client));
+            }
+        </script>
+        <script>
+            function getAllClients() {
+                const clientsDataContainer = document.getElementById('clientsDataContainer');
+
+                fetch('/api/client')
+                    .then(response => response.created())
+                    .then(client => clientsDataContainer.innerHTML = JSON.stringify(client));
+            }
+        </script>
+    </head>
+
+    <body>
+    <h4>Создать клиента</h4>
+    <input type="text" id="clientNameTextBox" value="Имя" placeholder="Введите имя клиента">
+    <input type="text" id="clientAddressTextBox" value="Адрес" placeholder="Введите адрес клиента">
+    <input type="text" id="clientPhonesTextBox" value="1111" placeholder="Введите телефоны клиента (через запятую)"
+           size="35">
+    <button onclick="createClient()">Создать</button>
+    <pre id="clientCreationContainer"></pre>
+
+    <h4>Получить клиента по id</h4>
+    <input type="text" id="clientIdTextBox" value="1" placeholder="Введите id клиента">
+    <button onclick="getClientById()">Получить</button>
+    <pre id="clientDataContainer"></pre>
+
+    <h4>Список клиентов</h4>
+        <table style="width: 400px">
+            <thead>
+                <tr>
+                    <td style="width: 50px">Id</td>
+                    <td style="width: 150px">Имя</td>
+                    <td style="width: 100px">Адрес</td>
+                    <td style="width: 100px">Телефоны</td>
+                </tr>
+            </thead>
+            <tbody>
+                <#list clients as client>
+                    <tr>
+                        <td>${client.id}</td>
+                        <td>${client.name}</td>
+                        <td>${client.address.street}</td>
+                        <td>
+                            <#list client.phones as phone>
+                                ${phone.number};
+                            </#list>
+                        </td>
+                    </tr>
+                </#list>
+            </tbody>
+        </table>
+    </body>
+</html>
