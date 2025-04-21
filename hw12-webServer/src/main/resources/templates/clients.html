@@ -3,42 +3,72 @@
         <title>Клиенты</title>
         <script>
             function createClient() {
-                const clientNameTextBox = document.getElementById('clientNameTextBox');
-                const clientAddressTextBox = document.getElementById('clientAddressTextBox');
-                const clientPhonesTextBox = document.getElementById('clientPhonesTextBox');
+                const clientName = document.getElementById('clientNameTextBox').value;
+                const clientAddress = document.getElementById('clientAddressTextBox').value;
+                const clientPhones = document.getElementById('clientPhonesTextBox').value;
                 const clientCreationContainer = document.getElementById('clientCreationContainer');
-
-                const client = {
-                    name: clientNameTextBox.value,
-                    address: clientAddressTextBox.value,
-                    phones: clientPhonesTextBox.value
+                var client = {
+                    name: clientName,
+                    address: clientAddress,
+                    phones: clientPhones
                 };
 
-                fetch('/api/client', {
+                fetch('api/client', {
                         method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(client)
                      })
-                    .then(response => response.json())
-                    .then(newClient => clientCreationContainer.innerHTML = JSON.stringify(newClient));
+                    .then(response => {
+                        if (response.status === 201) {
+                            var id = response.json()
+                                .then(data => clientCreationContainer.innerHTML = 'Клиент создан. Id = ' + data.id);
+                        } else {
+                            clientCreationContainer.innerHTML = 'Ошибка создания клиента';
+                        }
+                    }
+                    );
             }
-        </script>
-        <script>
-            function getClientById() {
-                const clientIdTextBox = document.getElementById('clientIdTextBox');
-                const clientDataContainer = document.getElementById('clientDataContainer');
-                const id = clientIdTextBox.value;
-                fetch('/api/client/' + id)
-                    .then(response => response.json())
-                    .then(client => clientDataContainer.innerHTML = JSON.stringify(client));
-            }
-        </script>
-        <script>
-            function getAllClients() {
-                const clientsDataContainer = document.getElementById('clientsDataContainer');
 
-                fetch('/api/client')
-                    .then(response => response.created())
-                    .then(client => clientsDataContainer.innerHTML = JSON.stringify(client));
+            function getClientById() {
+                const id = document.getElementById('clientIdTextBox').value;
+                const clientDataContainer = document.getElementById('clientDataContainer');
+
+                fetch('api/client/' + id)
+                    .then(response => response.json())
+                    .then(client => createClientTable(client, 'clientTable'));
+            }
+
+            function getAllClients() {
+                fetch('api/client')
+                    .then(response => response.json())
+                    .then(clients => createClientTable(clients, 'clientsTable'));
+            }
+
+           function createClientTable(clients, elementId) {
+                document.getElementById(elementId).innerHTML = '';
+                const table = document.createElement('table');
+                const row = table.insertRow();
+                row.insertCell().textContent = 'Id';
+                row.insertCell().textContent = 'Имя';
+                row.insertCell().textContent = 'Адрес';
+                row.insertCell().textContent = 'Телефоны';
+                clients.forEach(client => {
+                        const row = table.insertRow();
+                        const cellId = row.insertCell();
+                        cellId.textContent = client.id;
+                        const cellName = row.insertCell();
+                        cellName.textContent = client.name;
+                        const cellAddress = row.insertCell();
+                        cellAddress.textContent = client.address.street;
+                        const cellPhones = row.insertCell();
+                        cellPhones.textContent = client.phones.map(phone => phone.number).join(", ");
+                    }
+                );
+                table.style.border = '1px solid';
+                document.getElementById(elementId).appendChild(table);
             }
         </script>
     </head>
@@ -52,35 +82,13 @@
     <button onclick="createClient()">Создать</button>
     <pre id="clientCreationContainer"></pre>
 
-    <h4>Получить клиента по id</h4>
-    <input type="text" id="clientIdTextBox" value="1" placeholder="Введите id клиента">
-    <button onclick="getClientById()">Получить</button>
-    <pre id="clientDataContainer"></pre>
+    <h4>Получить клиента по Id</h4>
+    <input type="text" id="clientIdTextBox" value="1" placeholder="Введите Id клиента">
+    <button onclick="getClientById()">Получить клиента</button>
+    <div id="clientTable"></div>
 
-    <h4>Список клиентов</h4>
-        <table style="width: 400px">
-            <thead>
-                <tr>
-                    <td style="width: 50px">Id</td>
-                    <td style="width: 150px">Имя</td>
-                    <td style="width: 100px">Адрес</td>
-                    <td style="width: 100px">Телефоны</td>
-                </tr>
-            </thead>
-            <tbody>
-                <#list clients as client>
-                    <tr>
-                        <td>${client.id}</td>
-                        <td>${client.name}</td>
-                        <td>${client.address.street}</td>
-                        <td>
-                            <#list client.phones as phone>
-                                ${phone.number};
-                            </#list>
-                        </td>
-                    </tr>
-                </#list>
-            </tbody>
-        </table>
+    <h4>Получить список клиентов</h4>
+    <button onclick="getAllClients()">Получить клиентов</button>
+    <div id="clientsTable"></div>
     </body>
 </html>

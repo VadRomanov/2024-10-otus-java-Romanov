@@ -12,8 +12,9 @@ import ru.otus.helpers.FileSystemHelper;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.services.UserAuthService;
 import ru.otus.servlet.AuthorizationFilter;
-import ru.otus.servlet.LoginServlet;
 import ru.otus.servlet.ClientsApiServlet;
+import ru.otus.servlet.ClientsServlet;
+import ru.otus.servlet.LoginServlet;
 
 import java.util.Arrays;
 
@@ -61,7 +62,7 @@ public class ClientsWebServerWithFilterBasedSecurity implements ClientsWebServer
 
         Handler.Sequence sequence = new Handler.Sequence();
         sequence.addHandler(resourceHandler);
-        sequence.addHandler(applySecurity(servletContextHandler, "/api/client/*"));
+        sequence.addHandler(applySecurity(servletContextHandler, "/clients", "/api/client/*"));
 
         server.setHandler(sequence);
     }
@@ -87,7 +88,8 @@ public class ClientsWebServerWithFilterBasedSecurity implements ClientsWebServer
 
     private ServletContextHandler createServletContextHandler() {
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        servletContextHandler.addServlet(new ServletHolder(new ClientsApiServlet(dbServiceClient, templateProcessor, gson)), "/api/client/*");
+        servletContextHandler.addServlet(new ServletHolder(new ClientsApiServlet(dbServiceClient, gson)), "/api/client/*");
+        servletContextHandler.addServlet(new ServletHolder(new ClientsServlet(templateProcessor)), "/clients");
         return servletContextHandler;
     }
 }
