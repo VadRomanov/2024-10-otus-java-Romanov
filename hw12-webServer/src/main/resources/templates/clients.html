@@ -1,0 +1,94 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Клиенты</title>
+        <script>
+            function createClient() {
+                const clientName = document.getElementById('clientNameTextBox').value;
+                const clientAddress = document.getElementById('clientAddressTextBox').value;
+                const clientPhones = document.getElementById('clientPhonesTextBox').value;
+                const clientCreationContainer = document.getElementById('clientCreationContainer');
+                var client = {
+                    name: clientName,
+                    address: clientAddress,
+                    phones: clientPhones
+                };
+
+                fetch('api/client', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(client)
+                     })
+                    .then(response => {
+                        if (response.status === 201) {
+                            var id = response.json()
+                                .then(data => clientCreationContainer.innerHTML = 'Клиент создан. Id = ' + data.id);
+                        } else {
+                            clientCreationContainer.innerHTML = 'Ошибка создания клиента';
+                        }
+                    }
+                    );
+            }
+
+            function getClientById() {
+                const id = document.getElementById('clientIdTextBox').value;
+                const clientDataContainer = document.getElementById('clientDataContainer');
+
+                fetch('api/client/' + id)
+                    .then(response => response.json())
+                    .then(client => createClientTable(client, 'clientTable'));
+            }
+
+            function getAllClients() {
+                fetch('api/client')
+                    .then(response => response.json())
+                    .then(clients => createClientTable(clients, 'clientsTable'));
+            }
+
+           function createClientTable(clients, elementId) {
+                document.getElementById(elementId).innerHTML = '';
+                const table = document.createElement('table');
+                const row = table.insertRow();
+                row.insertCell().textContent = 'Id';
+                row.insertCell().textContent = 'Имя';
+                row.insertCell().textContent = 'Адрес';
+                row.insertCell().textContent = 'Телефоны';
+                clients.forEach(client => {
+                        const row = table.insertRow();
+                        const cellId = row.insertCell();
+                        cellId.textContent = client.id;
+                        const cellName = row.insertCell();
+                        cellName.textContent = client.name;
+                        const cellAddress = row.insertCell();
+                        cellAddress.textContent = client.address.street;
+                        const cellPhones = row.insertCell();
+                        cellPhones.textContent = client.phones.map(phone => phone.number).join(", ");
+                    }
+                );
+                table.style.border = '1px solid';
+                document.getElementById(elementId).appendChild(table);
+            }
+        </script>
+    </head>
+
+    <body>
+    <h4>Создать клиента</h4>
+    <input type="text" id="clientNameTextBox" value="Имя" placeholder="Введите имя клиента">
+    <input type="text" id="clientAddressTextBox" value="Адрес" placeholder="Введите адрес клиента">
+    <input type="text" id="clientPhonesTextBox" value="1111" placeholder="Введите телефоны клиента (через запятую)"
+           size="35">
+    <button onclick="createClient()">Создать</button>
+    <pre id="clientCreationContainer"></pre>
+
+    <h4>Получить клиента по Id</h4>
+    <input type="text" id="clientIdTextBox" value="1" placeholder="Введите Id клиента">
+    <button onclick="getClientById()">Получить клиента</button>
+    <div id="clientTable"></div>
+
+    <h4>Получить список клиентов</h4>
+    <button onclick="getAllClients()">Получить клиентов</button>
+    <div id="clientsTable"></div>
+    </body>
+</html>
