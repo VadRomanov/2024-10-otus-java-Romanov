@@ -35,6 +35,7 @@ allprojects {
     val protobufBom: String by project
     val guava: String by project
     val reflections: String by project
+    val springDocOpenapiUi: String by project
 
     apply(plugin = "io.spring.dependency-management")
     dependencyManagement {
@@ -46,6 +47,7 @@ allprojects {
             }
             dependency("com.google.guava:guava:$guava")
             dependency("org.reflections:reflections:$reflections")
+            dependency("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenapiUi")
         }
     }
 
