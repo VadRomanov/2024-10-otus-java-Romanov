@@ -36,11 +36,16 @@
 
         function getClientById() {
             const id = document.getElementById('clientIdTextBox').value;
-            const clientDataContainer = document.getElementById('clientDataContainer');
 
             fetch('api/client/' + id)
-                .then(response => response.json())
-                .then(client => createClientTable(new Array(client), 'clientTable'));
+                .then(response => {
+                    if (response.status === 200) {
+                        var client = response.json()
+                            .then(client => createClientTable(new Array(client), 'clientTable'));
+                    } else {
+                        clientTable.innerHTML = 'Клиент не найден';
+                    }
+                });
         }
 
         function getAllClients() {
