@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.otus.service.ClientInfoService;
-import ru.otus.web.dto.ClientInfoResponseDto;
+import ru.otus.web.dto.ClientInfoDto;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class ClientController {
 
     @GetMapping({"/clients"})
     public String clientsListView(Model model) {
-        List<ClientInfoResponseDto> clients = clientInfoService.getAllClientInfo();
+        List<ClientInfoDto> clients = clientInfoService.getAllClientInfo();
         model.addAttribute("clients", clients);
         return "clients";
     }

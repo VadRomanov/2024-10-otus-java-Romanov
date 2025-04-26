@@ -1,15 +1,14 @@
 package ru.otus.service;
 
-import ru.otus.web.dto.ClientInfoResponseDto;
-import ru.otus.web.dto.CreationRequestDto;
-import ru.otus.web.dto.CreationResponseDto;
+import ru.otus.web.dto.ClientInfoDto;
+import ru.otus.web.dto.ClientCreationDto;
 
 import java.util.List;
 
 public interface ClientInfoService {
-    CreationResponseDto saveClientInfo(CreationRequestDto creationRequestDto);
+    long saveClientInfo(ClientCreationDto clientCreationDto);
 
-    ClientInfoResponseDto getClientInfoById(long clientId);
+    ClientInfoDto getClientInfoById(long clientId);
 
-    List<ClientInfoResponseDto> getAllClientInfo();
+    List<ClientInfoDto> getAllClientInfo();
 }

@@ -7,9 +7,8 @@ import ru.otus.crm.model.Phone;
 import ru.otus.crm.service.DBServiceAddress;
 import ru.otus.crm.service.DBServiceClient;
 import ru.otus.crm.service.DBServicePhone;
-import ru.otus.web.dto.ClientInfoResponseDto;
-import ru.otus.web.dto.CreationRequestDto;
-import ru.otus.web.dto.CreationResponseDto;
+import ru.otus.web.dto.ClientInfoDto;
+import ru.otus.web.dto.ClientCreationDto;
 import ru.otus.web.mapper.ClientInfoMapper;
 
 import java.util.List;
@@ -32,21 +31,21 @@ public class ClientInfoServiceImpl implements ClientInfoService {
     }
 
     @Override
-    public CreationResponseDto saveClientInfo(CreationRequestDto creationRequestDto) {
+    public long saveClientInfo(ClientCreationDto clientCreationDto) {
         Address savedAddress = dbServiceAddress.saveAddress(
-                new Address(null, creationRequestDto.address(), null));
+                new Address(null, clientCreationDto.address(), null));
         Client savedClient = dbServiceClient.saveClient(
-                new Client(null, savedAddress.id(), creationRequestDto.name(), null));
+                new Client(null, savedAddress.id(), clientCreationDto.name(), null));
         dbServicePhone.saveBatch(
-                creationRequestDto.phones().stream()
+                clientCreationDto.phones().stream()
                         .map(num -> new Phone(null, savedClient.id(), num))
                         .collect(Collectors.toSet()));
 
-        return new CreationResponseDto(savedClient.id());
+        return savedClient.id();
     }
 
     @Override
-    public ClientInfoResponseDto getClientInfoById(long clientId) {
+    public ClientInfoDto getClientInfoById(long clientId) {
         Client client = dbServiceClient.getClient(clientId)
                 .orElseThrow(() -> new RuntimeException("Client not found"));
         Address address = dbServiceAddress.getAddress(client.addressId())
@@ -56,7 +55,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
     }
 
     @Override
-    public List<ClientInfoResponseDto> getAllClientInfo() {
+    public List<ClientInfoDto> getAllClientInfo() {
         List<Client> client = dbServiceClient.findAll();
         return client.stream()
                 .map(c -> clientInfoMapper.toDto(c, dbServiceAddress.getAddress(c.addressId()).get()))

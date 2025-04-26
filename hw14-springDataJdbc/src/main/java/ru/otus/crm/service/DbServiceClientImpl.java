@@ -7,7 +7,6 @@ import ru.otus.sessionmanager.TransactionManager;
 import ru.otus.crm.model.Client;
 import ru.otus.crm.repository.ClientRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,15 +34,14 @@ public class DbServiceClientImpl implements DBServiceClient {
     @Override
     public Optional<Client> getClient(long id) {
         var clientOptional = clientRepository.findById(id);
-        log.info("client: {}", clientOptional);
+        log.info("client by id {} {}exist", id, clientOptional.isEmpty() ? "does not " : "");
         return clientOptional;
     }
 
     @Override
     public List<Client> findAll() {
-        var clientList = new ArrayList<Client>();
-        clientRepository.findAll().forEach(clientList::add);
-        log.info("clientList:{}", clientList);
+        var clientList = clientRepository.findAll();
+        log.info("clientList size:{}", clientList.size());
         return clientList;
     }
 }

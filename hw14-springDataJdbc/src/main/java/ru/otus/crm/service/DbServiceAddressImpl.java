@@ -33,7 +33,7 @@ public class DbServiceAddressImpl implements DBServiceAddress {
     @Override
     public Optional<Address> getAddress(long id) {
         var addressOptional = addressRepository.findById(id);
-        log.info("address: {}", addressOptional);
+        log.info("address by id {} {}exist", id, addressOptional.isEmpty() ? "does not " : "");
         return addressOptional;
     }
 
