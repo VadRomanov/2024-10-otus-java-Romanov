@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.otus.service.ClientInfoService;
 import ru.otus.web.dto.ClientInfoDto;
 import ru.otus.web.dto.ClientCreationDto;
-import ru.otus.web.dto.ClientCreationRespDto;
 
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class ClientRestController {
     }
 
     @PostMapping("/api/client")
-    public ResponseEntity<ClientCreationRespDto> saveClient(@RequestBody ClientCreationDto requestDto) {
-        return ResponseEntity.ok(new ClientCreationRespDto(clientInfoService.saveClientInfo(requestDto)));
+    public ResponseEntity<ClientInfoDto> saveClient(@RequestBody ClientCreationDto requestDto) {
+        return ResponseEntity.ok(clientInfoService.saveClientInfo(requestDto));
     }
 }

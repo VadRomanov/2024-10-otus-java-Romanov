@@ -6,7 +6,7 @@ import ru.otus.web.dto.ClientCreationDto;
 import java.util.List;
 
 public interface ClientInfoService {
-    long saveClientInfo(ClientCreationDto clientCreationDto);
+    ClientInfoDto saveClientInfo(ClientCreationDto clientCreationDto);
 
     ClientInfoDto getClientInfoById(long clientId);
 
