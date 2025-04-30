@@ -14,6 +14,8 @@ include("hw12-webServer")
 include("hw13-di")
 include("hw14-springDataJdbc")
 include("hw15-executors")
+include("hw17-multiprocess:client")
+include("hw17-multiprocess:server")
 
 pluginManagement {
     val jgitver: String by settings
