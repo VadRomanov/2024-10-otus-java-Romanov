@@ -33,7 +33,7 @@ public class NumbersClient {
             public void onNext(ServerMessage serverMessage) {
                 int value = serverMessage.getValue();
                 log.info("new value:{} ", value);
-                currentValue += value;
+                addValueToCurrent(value);
             }
 
             @Override
@@ -57,10 +57,15 @@ public class NumbersClient {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(1_000);
-                log.info("currentValue:{}", ++currentValue);
+                addValueToCurrent(1);
+                log.info("currentValue:{}", currentValue);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    private static synchronized void addValueToCurrent(int value) {
+        currentValue += value;
     }
 }
