@@ -36,6 +36,7 @@ allprojects {
     val guava: String by project
     val reflections: String by project
     val springDocOpenapiUi: String by project
+    val grpc: String by project
     val sockjs: String by project
     val stomp: String by project
     val bootstrap: String by project
@@ -52,6 +53,9 @@ allprojects {
             dependency("com.google.guava:guava:$guava")
             dependency("org.reflections:reflections:$reflections")
             dependency("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenapiUi")
+            dependency("io.grpc:grpc-netty:$grpc")
+            dependency("io.grpc:grpc-protobuf:$grpc")
+            dependency("io.grpc:grpc-stub:$grpc")
             dependency("org.webjars:sockjs-client:$sockjs")
             dependency("org.webjars:stomp-websocket:$stomp")
             dependency("org.webjars:bootstrap:$bootstrap")
