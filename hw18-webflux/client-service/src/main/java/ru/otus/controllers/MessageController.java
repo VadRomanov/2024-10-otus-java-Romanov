@@ -36,6 +36,7 @@ public class MessageController {
     public void getMessage(@DestinationVariable("roomId") String roomId, Message message) {
         logger.info("get message:{}, roomId:{}", message, roomId);
         if (roomId.equals(MYSTICAL_ROOM_NUMBER)) {
+            logger.info("Something went wrong. It is impossible to send messages from this room. RoomId:{}", roomId);
             return;
         }
         saveMessage(roomId, message).subscribe(msgId -> logger.info("message send id:{}", msgId));
