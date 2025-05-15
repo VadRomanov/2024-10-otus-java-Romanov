@@ -22,6 +22,7 @@ public class MessageController {
     private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     private static final String TOPIC_TEMPLATE = "/topic/response.";
+    private static final String MYSTICAL_ROOM_NUMBER = "1408";
 
     private final WebClient datastoreClient;
     private final SimpMessagingTemplate template;
@@ -34,10 +35,16 @@ public class MessageController {
     @MessageMapping("/message.{roomId}")
     public void getMessage(@DestinationVariable("roomId") String roomId, Message message) {
         logger.info("get message:{}, roomId:{}", message, roomId);
+        if (roomId.equals(MYSTICAL_ROOM_NUMBER)) {
+            return;
+        }
         saveMessage(roomId, message).subscribe(msgId -> logger.info("message send id:{}", msgId));
 
         template.convertAndSend(
                 String.format("%s%s", TOPIC_TEMPLATE, roomId), new Message(HtmlUtils.htmlEscape(message.messageStr())));
+        template.convertAndSend(
+                String.format("%s%s", TOPIC_TEMPLATE, MYSTICAL_ROOM_NUMBER),
+                new Message(HtmlUtils.htmlEscape(message.messageStr())));
     }
 
     @EventListener
@@ -86,7 +93,7 @@ public class MessageController {
     private Flux<Message> getMessagesByRoomId(long roomId) {
         return datastoreClient
                 .get()
-                .uri(String.format("/msg/%s", roomId))
+                .uri(prepareUri(roomId))
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchangeToFlux(response -> {
                     if (response.statusCode().equals(HttpStatus.OK)) {
@@ -95,5 +102,10 @@ public class MessageController {
                         return response.createException().flatMapMany(Mono::error);
                     }
                 });
+    }
+
+    private String prepareUri(long roomId) {
+        boolean isMysticalRoom = roomId == Long.parseLong(MYSTICAL_ROOM_NUMBER);
+        return String.format("/msg%s", isMysticalRoom ? "" : "/" + roomId);
     }
 }
