@@ -17,6 +17,8 @@ include("hw15-executors")
 include("hw16-concurrentCollections")
 include("hw17-multiprocess:client")
 include("hw17-multiprocess:server")
+include("hw18-webflux:client-service")
+include("hw18-webflux:datastore-service")
 
 pluginManagement {
     val jgitver: String by settings
